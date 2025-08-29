@@ -152,7 +152,7 @@ def get_lti_1p3_launch_info(
         client_id = external_config.get('lti_1p3_client_id')
 
     # Return LTI launch information for end user configuration
-    return_data = {
+    return {
         'client_id': client_id,
         'keyset_url': get_lms_lti_keyset_link(config_id, lms_root_url),
         'deployment_id': '1',
@@ -162,10 +162,6 @@ def get_lti_1p3_launch_info(
         'deep_linking_content_items':
             json.dumps(deep_linking_content_items, indent=4) if deep_linking_content_items else None,
     }
-    import logging
-    logging.info("#AMANK: LMS_ROOT_URL",lms_root_url)
-    logging.info("#AMANK: return_data",return_data)
-    return return_data
 
 
 def get_lti_1p3_launch_start_url(
