@@ -90,8 +90,7 @@ from .utils import (
 )
 
 
-from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
-from xmodule.modulestore.django import modulestore
+
 
 log = logging.getLogger(__name__)
 
@@ -1229,6 +1228,8 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             return self.student_view(context)
 
         course_id = self.scope_ids.usage_id.course_key
+        from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+        from xmodule.modulestore.django import modulestore
         if course_id is not None:
             course_org = modulestore().get_course(course_id).id.org
         if course_org:
