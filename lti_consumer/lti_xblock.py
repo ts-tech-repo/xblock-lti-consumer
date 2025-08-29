@@ -1234,7 +1234,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             course_org = modulestore().get_course(course_id).id.org
         if course_org:
             site_config = SiteConfiguration.get_configuration_for_org(course_org)
-            lms_root_url = site_config.get('LMS_ROOT_URL', None)
+            lms_root_url = site_config.get_value('LMS_ROOT_URL', None)
             if lms_root_url:
                 context['lms_root_url'] = lms_root_url
                 self.lms_root_url = lms_root_url
