@@ -32,7 +32,7 @@ def _(text):
     return text
 
 
-def get_lti_api_base():
+def get_lti_api_base(lms_root_url=None):
     """
     Returns base url to be used as issuer on OAuth2 flows
     and in various LTI API calls. If LTI_API_BASE is set this will
@@ -43,7 +43,9 @@ def get_lti_api_base():
     One possible improvement is to use `contentstore.get_lms_link_for_item`
     and strip the base domain name.
     """
-    if hasattr(settings, 'LTI_API_BASE'):
+    if lms_root_url:
+        return lms_root_url
+    elif hasattr(settings, 'LTI_API_BASE'):
         return settings.LTI_API_BASE
     elif hasattr(settings, 'LTI_BASE'):
         return settings.LTI_BASE
@@ -53,12 +55,14 @@ def get_lti_api_base():
         return settings.LMS_ROOT_URL
 
 
-def get_lti_view_base():
+def get_lti_view_base(lms_root_url=None):
     """
     Returns base url to be used when generating view and redirect urls
     as part of the LTI launch flow.
     """
-    if hasattr(settings, 'LTI_BASE'):
+    if lms_root_url:
+        return lms_root_url
+    elif hasattr(settings, 'LTI_BASE'):
         return settings.LTI_BASE
     else:
         # Eventually we should move away from supporting this setting as it is incorrect
@@ -66,37 +70,37 @@ def get_lti_view_base():
         return settings.LMS_ROOT_URL
 
 
-def get_lms_lti_keyset_link(config_id):
+def get_lms_lti_keyset_link(config_id, lms_root_url=None):
     """
     Returns an LMS link to LTI public keyset endpoint
 
     :param config_id: the config_id of the LtiConfiguration object
     """
     return "{lms_base}/api/lti_consumer/v1/public_keysets/{config_id}".format(
-        lms_base=get_lti_api_base(),
+        lms_base=get_lti_api_base(lms_root_url),
         config_id=str(config_id),
     )
 
 
-def get_lms_lti_launch_link():
+def get_lms_lti_launch_link(lms_root_url=None):
     """
     Returns an LMS link to LTI Launch endpoint
 
     :param location: the location of the block
     """
     return "{lms_base}/api/lti_consumer/v1/launch/".format(
-        lms_base=get_lti_view_base(),
+        lms_base=get_lti_view_base(lms_root_url),
     )
 
 
-def get_lms_lti_access_token_link(config_id):
+def get_lms_lti_access_token_link(config_id, lms_root_url=None):
     """
     Returns an LMS link to LTI Launch endpoint
 
     :param config_id: the config_id of the LtiConfiguration object
     """
     return "{lms_base}/api/lti_consumer/v1/token/{config_id}".format(
-        lms_base=get_lti_api_base(),
+        lms_base=get_lti_api_base(lms_root_url),
         config_id=str(config_id),
     )
 

@@ -109,6 +109,7 @@ class LtiConsumer1p3:
     def prepare_preflight_url(
             self,
             launch_data,
+            lms_root_url = None
     ):
         """
         Generates OIDC url with parameters
@@ -127,7 +128,7 @@ class LtiConsumer1p3:
 
         login_hint = user_id
         parameters = {
-            "iss": self.iss,
+            "iss": lms_root_url if lms_root_url else self.iss,
             "client_id": self.client_id,
             "lti_deployment_id": self.deployment_id,
             "target_link_uri": self.launch_url,

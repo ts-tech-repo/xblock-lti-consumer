@@ -1183,9 +1183,11 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
 
         # Retrieve LTI 1.3 Launch information
         launch_data = self.get_lti_1p3_launch_data()
+        lms_root_url = self.lms_root_url or None
         context.update(
             get_lti_1p3_launch_info(
                 launch_data,
+                lms_root_url
             )
         )
 
