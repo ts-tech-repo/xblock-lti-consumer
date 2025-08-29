@@ -89,6 +89,9 @@ from .utils import (
     external_multiple_launch_urls_enabled,
 )
 
+
+
+
 log = logging.getLogger(__name__)
 
 DOCS_ANCHOR_TAG_OPEN = (
@@ -604,6 +607,15 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
         help = _("The completion time to show completion popup."),
         default = 5000,
         scope = Scope.settings
+    )
+
+    lms_root_url = String(
+        display_name=_("LMS ROOT URL"),
+        help=_(
+            "The LMS URL of this course."
+        ),
+        default='',
+        scope=Scope.settings
     )
 
     # Possible editable fields
@@ -1171,9 +1183,11 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
 
         # Retrieve LTI 1.3 Launch information
         launch_data = self.get_lti_1p3_launch_data()
+        lms_root_url = self.lms_root_url or None
         context.update(
             get_lti_1p3_launch_info(
                 launch_data,
+                lms_root_url
             )
         )
 
@@ -1214,6 +1228,20 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
         """
         if self.lti_version == "lti_1p1":
             return self.student_view(context)
+
+        course_id = self.scope_ids.usage_id.course_key
+        from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+        from xmodule.modulestore.django import modulestore
+        if course_id is not None:
+            course_org = modulestore().get_course(course_id).id.org
+        if course_org:
+            site_config = SiteConfiguration.get_configuration_for_org(course_org)
+            lms_root_url = site_config.get_value('LMS_ROOT_URL', None)
+            if lms_root_url:
+                context['lms_root_url'] = lms_root_url
+                self.lms_root_url = lms_root_url
+        else:
+            logging.info("#AMANK: course_org is None")
 
         # Render template
         fragment = Fragment()
@@ -1790,6 +1818,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             'accept_grades_past_due': self.accept_grades_past_due,
             'lti_version': self.lti_version,
             'completion_time': self.completion_time * 60000,
+            'lms_root_url': self.lms_root_url,
         }
 
     def _get_modal_position_offset(self, viewport_percentage):

@@ -110,7 +110,7 @@ def get_lti_consumer(config_id):
 
 
 def get_lti_1p3_launch_info(
-    launch_data,
+    launch_data, lms_root_url=None
 ):
     """
     Retrieves the Client ID, Keyset URL and other urls used to configure a LTI tool.
@@ -130,6 +130,7 @@ def get_lti_1p3_launch_info(
         launch_data.message_type = "LtiDeepLinkingRequest"
         deep_linking_launch_url = lti_consumer.prepare_preflight_url(
             launch_data,
+            lms_root_url
         )
 
         # Retrieve LTI Content Items (if any was set up)
@@ -153,10 +154,10 @@ def get_lti_1p3_launch_info(
     # Return LTI launch information for end user configuration
     return {
         'client_id': client_id,
-        'keyset_url': get_lms_lti_keyset_link(config_id),
+        'keyset_url': get_lms_lti_keyset_link(config_id, lms_root_url),
         'deployment_id': '1',
-        'oidc_callback': get_lms_lti_launch_link(),
-        'token_url': get_lms_lti_access_token_link(config_id),
+        'oidc_callback': get_lms_lti_launch_link(lms_root_url),
+        'token_url': get_lms_lti_access_token_link(config_id, lms_root_url),
         'deep_linking_launch_url': deep_linking_launch_url,
         'deep_linking_content_items':
             json.dumps(deep_linking_content_items, indent=4) if deep_linking_content_items else None,
