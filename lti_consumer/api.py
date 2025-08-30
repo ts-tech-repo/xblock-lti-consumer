@@ -186,7 +186,11 @@ def get_lti_1p3_launch_start_url(
         launch_data.deep_linking_content_item_id = dl_content_id
 
     # Prepare and return OIDC flow start url
-    return lti_consumer.prepare_preflight_url(launch_data)
+    import logging
+    logging.info(f"Preparing OIDC flow start URL for launch data: {launch_data}")
+    from openedx.core.djangoapps.site_configuration import helpers as configuration_helpers
+    lms_root_url = configuration_helpers.get_value("LMS_ROOT_URL", None)
+    return lti_consumer.prepare_preflight_url(launch_data, lms_root_url)
 
 
 def get_lti_1p3_content_url(
