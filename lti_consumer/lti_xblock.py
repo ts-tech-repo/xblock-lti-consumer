@@ -1732,7 +1732,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             course.display_org_with_default if course else "",
         ])
 
-    def _get_lti_block_launch_handler(self):
+    def _get_lti_block_launch_handler(self, lms_root_url = None):
         """
         Return the LTI block launch handler.
         """
@@ -1746,6 +1746,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             from lti_consumer.api import get_lti_1p3_content_url  # pylint: disable=import-outside-toplevel
             lti_block_launch_handler = get_lti_1p3_content_url(
                 launch_data,
+                lms_root_url = lms_root_url
             )
 
         return lti_block_launch_handler
@@ -1786,7 +1787,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
             lti_consumer = self._get_lti_consumer()
 
         launch_url = self._get_lti_launch_url(lti_consumer)
-        lti_block_launch_handler = self._get_lti_block_launch_handler()
+        lti_block_launch_handler = self._get_lti_block_launch_handler(lms_root_url = self.lms_root_url)
         lti_1p3_launch_url = self._get_lti_1p3_launch_url(lti_consumer)
 
         # The values of ask_to_send_username, ask_to_send_full_name, and ask_to_send_email should only apply if PII

@@ -105,7 +105,7 @@ def get_lms_lti_access_token_link(config_id, lms_root_url=None):
     )
 
 
-def get_lti_ags_lineitems_url(lti_config_id, lineitem_id=None):
+def get_lti_ags_lineitems_url(lti_config_id, lineitem_id=None, lms_root_url=None):
     """
     Return the LTI AGS endpoint
 
@@ -115,7 +115,7 @@ def get_lti_ags_lineitems_url(lti_config_id, lineitem_id=None):
     """
 
     url = "{lms_base}/api/lti_consumer/v1/lti/{lti_config_id}/lti-ags".format(
-        lms_base=get_lti_api_base(),
+        lms_base=get_lti_api_base(lms_root_url = lms_root_url),
         lti_config_id=str(lti_config_id),
     )
 
@@ -125,19 +125,19 @@ def get_lti_ags_lineitems_url(lti_config_id, lineitem_id=None):
     return url
 
 
-def get_lti_deeplinking_response_url(lti_config_id):
+def get_lti_deeplinking_response_url(lti_config_id, lms_root_url=None):
     """
     Return the LTI Deep Linking response endpoint
 
     :param lti_config_id: LTI configuration id
     """
     return "{lms_base}/api/lti_consumer/v1/lti/{lti_config_id}/lti-dl/response".format(
-        lms_base=get_lti_api_base(),
+        lms_base=get_lti_api_base(lms_root_url = lms_root_url),
         lti_config_id=str(lti_config_id),
     )
 
 
-def get_lti_deeplinking_content_url(lti_config_id, launch_data):
+def get_lti_deeplinking_content_url(lti_config_id, launch_data, lms_root_url=None):
     """
     Return the LTI Deep Linking content presentation endpoint
 
@@ -145,7 +145,7 @@ def get_lti_deeplinking_content_url(lti_config_id, launch_data):
     :param launch_data: (lti_consumer.data.Lti1p3LaunchData): a class containing data necessary for an LTI 1.3 launch
     """
     url = "{lms_base}/api/lti_consumer/v1/lti/{lti_config_id}/lti-dl/content".format(
-        lms_base=get_lti_api_base(),
+        lms_base=get_lti_api_base(lms_root_url = lms_root_url),
         lti_config_id=str(lti_config_id),
     )
     url += "?"
@@ -159,7 +159,7 @@ def get_lti_deeplinking_content_url(lti_config_id, launch_data):
     return url
 
 
-def get_lti_nrps_context_membership_url(lti_config_id):
+def get_lti_nrps_context_membership_url(lti_config_id, lms_root_url=None):
     """
     Returns The LTI NRPS Context Membership service URL.
 
@@ -167,7 +167,7 @@ def get_lti_nrps_context_membership_url(lti_config_id):
     """
 
     return "{lms_base}/api/lti_consumer/v1/lti/{lti_config_id}/memberships".format(
-        lms_base=get_lti_api_base(),
+        lms_base=get_lti_api_base(lms_root_url=lms_root_url),
         lti_config_id=str(lti_config_id),
     )
 

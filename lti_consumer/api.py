@@ -195,6 +195,7 @@ def get_lti_1p3_launch_start_url(
 
 def get_lti_1p3_content_url(
     launch_data,
+    lms_root_url=None
 ):
     """
     Computes and returns which URL the LTI consumer should launch to.
@@ -225,7 +226,7 @@ def get_lti_1p3_content_url(
         )
 
     # If there's more than one content item, return content presentation URL
-    return get_lti_deeplinking_content_url(lti_config.id, launch_data)
+    return get_lti_deeplinking_content_url(lti_config.id, launch_data, lms_root_url = lms_root_url)
 
 
 def get_deep_linking_data(deep_linking_id, config_id):
