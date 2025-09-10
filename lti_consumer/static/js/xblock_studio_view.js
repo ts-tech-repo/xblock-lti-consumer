@@ -12,7 +12,6 @@ function LtiConsumerXBlockInitStudio(runtime, element, data) {
     ];
 
     const lti1P3FieldList = [
-        "lti_1p3_launch_url",
         "lti_1p3_redirect_uris",
         "lti_1p3_oidc_url",
         "lti_1p3_tool_key_mode",
@@ -197,7 +196,7 @@ function LtiConsumerXBlockInitStudio(runtime, element, data) {
             return storedLtiTools.filter(tool =>
                 tool.tool_name.toLowerCase().includes(searchTerm.toLowerCase())
             ).map(tool => ({
-                label: tool.tool_name, 
+                label: tool.tool_name,
                 value: tool.tool_url,
                 grade: tool.grade !== null ? tool.grade : "1.0"
             }));
@@ -224,7 +223,7 @@ function LtiConsumerXBlockInitStudio(runtime, element, data) {
             }
         }).on("input", function () {
             $(this).autocomplete("search");
-        });        
+        });
 
         // Fetch tools on load using course_shortName
         const courseShortName = window.location.href.split("+")[1] + "|" + window.location.href.split("+")[2];
