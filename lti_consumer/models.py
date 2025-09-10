@@ -450,7 +450,7 @@ class LtiConfiguration(models.Model):
             block = compat.load_enough_xblock(self.location)
             return block.lti_1p3_enable_nrps
 
-    def _setup_lti_1p3_ags(self, consumer):
+    def _setup_lti_1p3_ags(self, consumer, lms_root_url = None):
         """
         Set up LTI 1.3 Advantage Assigment and Grades Services.
         """
@@ -503,14 +503,14 @@ class LtiConfiguration(models.Model):
             )
 
         consumer.enable_ags(
-            lineitems_url=get_lti_ags_lineitems_url(self.id),
-            lineitem_url=get_lti_ags_lineitems_url(self.id, lineitem.id) if lineitem else None,
+            lineitems_url=get_lti_ags_lineitems_url(self.id, lineitem_id = None, lms_root_url = lms_root_url),
+            lineitem_url=get_lti_ags_lineitems_url(self.id, lineitem.id, lms_root_url = lms_root_url) if lineitem else None,
             allow_programmatic_grade_interaction=(
                 lti_advantage_ags_mode == self.LTI_ADVANTAGE_AGS_PROGRAMMATIC
             )
         )
 
-    def _setup_lti_1p3_deep_linking(self, consumer):
+    def _setup_lti_1p3_deep_linking(self, consumer, lms_root_url = None):
         """
         Set up LTI 1.3 Advantage Deep Linking.
         """
@@ -518,18 +518,18 @@ class LtiConfiguration(models.Model):
             if self.get_lti_advantage_deep_linking_enabled():
                 consumer.enable_deep_linking(
                     self.get_lti_advantage_deep_linking_launch_url(),
-                    get_lti_deeplinking_response_url(self.id),
+                    get_lti_deeplinking_response_url(self.id, lms_root_url = lms_root_url),
                 )
         except NotImplementedError as exc:
             log.exception("Error setting up LTI 1.3 Advantage Deep Linking: %s", exc)
 
-    def _setup_lti_1p3_nrps(self, consumer):
+    def _setup_lti_1p3_nrps(self, consumer, lms_root_url = None):
         """
         Set up LTI 1.3 Advantage Names and Role Provisioning Services.
         """
         try:
             if self.get_lti_advantage_nrps_enabled():
-                consumer.enable_nrps(get_lti_nrps_context_membership_url(self.id))
+                consumer.enable_nrps(get_lti_nrps_context_membership_url(self.id, lms_root_url = lms_root_url))
         except NotImplementedError as exc:
             log.exception("Error setting up LTI 1.3 Advantage Names and Role Provisioning Services: %s", exc)
 
@@ -540,6 +540,13 @@ class LtiConfiguration(models.Model):
         Uses the `config_store` variable to determine where to
         look for the configuration and instance the class.
         """
+        lms_root_url = None
+        course_org = self.location.org
+        log.info("#AMANK: course_org is %s", course_org)
+        from openedx.core.djangoapps.site_configuration.models import SiteConfiguration
+        if course_org is not None:
+            site_config = SiteConfiguration.get_configuration_for_org(course_org)
+            lms_root_url = site_config.get_value('LMS_ROOT_URL', None)
         consumer_class = LtiAdvantageConsumer
         # LTI Proctoring Services is not currently supported for CONFIG_ON_XBLOCK or CONFIG_EXTERNAL.
         # NOTE: This currently prevents an LTI Consumer from supporting both the LTI 1.3 proctoring feature and the LTI
@@ -552,7 +559,7 @@ class LtiConfiguration(models.Model):
             block = compat.load_enough_xblock(self.location)
 
             consumer = consumer_class(
-                iss=get_lti_api_base(),
+                iss=get_lti_api_base(lms_root_url = lms_root_url),
                 lti_oidc_url=block.lti_1p3_oidc_url,
                 lti_launch_url=block.lti_1p3_launch_url,
                 client_id=self.lti_1p3_client_id,
@@ -570,7 +577,7 @@ class LtiConfiguration(models.Model):
             )
         elif self.config_store == self.CONFIG_ON_DB:
             consumer = consumer_class(
-                iss=get_lti_api_base(),
+                iss=get_lti_api_base(lms_root_url = lms_root_url),
                 lti_oidc_url=self.lti_1p3_oidc_url,
                 lti_launch_url=self.lti_1p3_launch_url,
                 client_id=self.lti_1p3_client_id,
@@ -595,7 +602,7 @@ class LtiConfiguration(models.Model):
                 lti_launch_url = block.lti_1p3_launch_url or lti_launch_url
 
             consumer = consumer_class(
-                iss=get_lti_api_base(),
+                iss=get_lti_api_base(lms_root_url = lms_root_url),
                 lti_oidc_url=self.external_config.get('lti_1p3_oidc_url'),
                 lti_launch_url=lti_launch_url,
                 client_id=self.external_config.get('lti_1p3_client_id'),
@@ -615,9 +622,9 @@ class LtiConfiguration(models.Model):
             raise NotImplementedError
 
         if isinstance(consumer, LtiAdvantageConsumer):
-            self._setup_lti_1p3_ags(consumer)
-            self._setup_lti_1p3_deep_linking(consumer)
-            self._setup_lti_1p3_nrps(consumer)
+            self._setup_lti_1p3_ags(consumer, lms_root_url = lms_root_url)
+            self._setup_lti_1p3_deep_linking(consumer, lms_root_url = lms_root_url)
+            self._setup_lti_1p3_nrps(consumer, lms_root_url = lms_root_url)
 
         return consumer
 

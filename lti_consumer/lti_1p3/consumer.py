@@ -398,6 +398,7 @@ class LtiConsumer1p3:
         lti_launch_message.update({
             "nonce": preflight_response.get("nonce")
         })
+        log.info(f"lti_launch_message: {lti_launch_message}")
 
         return {
             "state": preflight_response.get("state"),

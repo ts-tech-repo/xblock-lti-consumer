@@ -434,6 +434,7 @@ def access_token_endpoint(
             lti_consumer = lti_config.get_lti_consumer()
         elif external_app and external_slug:
             lti_config = get_external_config_from_filter({}, external_id)
+            log.info("#AMANK external lti config: %s", lti_config)
 
             if not lti_config:
                 raise ExternalConfigurationNotFound("External LTI configuration not found")
