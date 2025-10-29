@@ -1759,7 +1759,7 @@ class LtiConsumerXBlock(StudioEditableXBlockMixin, XBlock):
 
         # Get LTI launch URL from consumer if using database or external configuration type.
         if consumer and self.lti_version == 'lti_1p3' and self.config_type in ('database', 'external'):
-            lti_1p3_launch_url = consumer.launch_url
+            lti_1p3_launch_url = consumer.lti_1p3_launch_url if lti_1p3_launch_url == '' else lti_1p3_launch_url
 
         return lti_1p3_launch_url
 
